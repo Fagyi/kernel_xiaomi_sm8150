@@ -32,6 +32,7 @@
 #include <drm/drm_print.h>
 #include <linux/sync_file.h>
 #include <linux/devfreq_boost.h>
+#include <linux/sched/sysctl.h>
 
 #include "drm_crtc_internal.h"
 
@@ -2248,7 +2249,9 @@ int drm_mode_atomic_ioctl(struct drm_device *dev,
 			(arg->flags & DRM_MODE_PAGE_FLIP_EVENT))
 		return -EINVAL;
 
-	if (!(arg->flags & DRM_MODE_ATOMIC_TEST_ONLY)) {
+	/* Do db frame boosts only when sched_boost is active */
+	if (!(arg->flags & DRM_MODE_ATOMIC_TEST_ONLY) &&
+		sysctl_sched_boost) {
 		devfreq_boost_kick(DEVFREQ_MSM_CPUBW);
 		devfreq_boost_kick(DEVFREQ_MSM_LLCCBW);
 	}
