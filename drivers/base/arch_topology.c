@@ -1,3 +1,30 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@Fagyi 
+Official-Ayrton990
+/
+Quantic-Kernel-AOSP-Cepheus
+1
+127
+ Code
+ Issues 0
+ Pull requests 0 Actions
+ Projects 0
+ Wiki
+ Security 0
+ Insights
+Quantic-Kernel-AOSP-Cepheus/drivers/base/arch_topology.c
+@Official-Ayrton990 Official-Ayrton990 Merge branch 'android-4.14-q' of https://android.googlesource.com/ker…
+34ac7ed 25 days ago
+@deggeman@vireshk@msrasmussen@gregkh@sudeep-holla@robherring@credp@qiwuchen@Official-Ayrton990
+508 lines (408 sloc)  11.3 KB
+ 
 /*
  * Arch specific cpu topology information
  *
@@ -183,21 +210,26 @@ int detect_share_cap_flag(void)
 
 		if (cpumask_equal(cpu_cpu_mask(cpu),
 				  policy->related_cpus)) {
-			share_cap_level = share_cap_die;
+			share_cap_level = share_cap_thread;
+			cpufreq_cpu_put(policy);
 			continue;
 		}
 
 		if (cpumask_equal(topology_core_cpumask(cpu),
 				  policy->related_cpus)) {
 			share_cap_level = share_cap_core;
+			cpufreq_cpu_put(policy);
 			continue;
 		}
 
 		if (cpumask_equal(topology_sibling_cpumask(cpu),
 				  policy->related_cpus)) {
-			share_cap_level = share_cap_thread;
+			share_cap_level = share_cap_die;
+			cpufreq_cpu_put(policy);
 			continue;
 		}
+
+		cpufreq_cpu_put(policy);
 	}
 
 	if (share_cap != share_cap_level) {
@@ -501,3 +533,16 @@ static void parsing_done_workfn(struct work_struct *work)
 #else
 core_initcall(free_raw_capacity);
 #endif
+© 2020 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+

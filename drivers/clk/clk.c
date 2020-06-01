@@ -3301,28 +3301,16 @@ static int clk_debug_create_one(struct clk_core *core, struct dentry *pdentry)
 
 	core->dentry = d;
 
-	d = debugfs_create_file("clk_rate", 0444, core->dentry, core,
-			&clock_rate_fops);
+	d = debugfs_create_ulong("clk_rate", 0444, core->dentry, &core->rate);
 	if (!d)
 		goto err_out;
 
-	if (core->ops->list_rate) {
-		if (!debugfs_create_file("clk_list_rates",
-				0444, core->dentry, core, &list_rates_fops))
-			goto err_out;
-	}
-
-	if (core->vdd_class && !debugfs_create_file("clk_rate_max",
-				0444, core->dentry, core, &rate_max_fops))
-		goto err_out;
-
-	d = debugfs_create_u32("clk_accuracy", 0444, core->dentry,
-			(u32 *)&core->accuracy);
+	d = debugfs_create_ulong("clk_accuracy", 0444, core->dentry,
+				 &core->accuracy);
 	if (!d)
 		goto err_out;
 
-	d = debugfs_create_u32("clk_phase", 0444, core->dentry,
-			(u32 *)&core->phase);
+	d = debugfs_create_u32("clk_phase", 0444, core->dentry, &core->phase);
 	if (!d)
 		goto err_out;
 
@@ -3332,17 +3320,17 @@ static int clk_debug_create_one(struct clk_core *core, struct dentry *pdentry)
 		goto err_out;
 
 	d = debugfs_create_u32("clk_prepare_count", 0444, core->dentry,
-			(u32 *)&core->prepare_count);
+			       &core->prepare_count);
 	if (!d)
 		goto err_out;
 
-	d = debugfs_create_file("clk_enable_count", 0444, core->dentry,
-			core, &clock_enable_fops);
+	d = debugfs_create_u32("clk_enable_count", 0444, core->dentry,
+			       &core->enable_count);
 	if (!d)
 		goto err_out;
 
 	d = debugfs_create_u32("clk_notifier_count", 0444, core->dentry,
-			(u32 *)&core->notifier_count);
+			       &core->notifier_count);
 	if (!d)
 		goto err_out;
 
@@ -3674,11 +3662,17 @@ static int __clk_core_init(struct clk_core *core)
 	if (core->flags & CLK_IS_CRITICAL) {
 		unsigned long flags;
 
-		clk_core_prepare(core);
+		ret = clk_core_prepare(core);
+		if (ret)
+			goto out;
 
 		flags = clk_enable_lock();
-		clk_core_enable(core);
+		ret = clk_core_enable(core);
 		clk_enable_unlock(flags);
+		if (ret) {
+			clk_core_unprepare(core);
+			goto out;
+		}
 	}
 
 	/*
