@@ -1,30 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@Fagyi 
-Official-Ayrton990
-/
-Quantic-Kernel-AOSP-Cepheus
-1
-127
- Code
- Issues 0
- Pull requests 0 Actions
- Projects 0
- Wiki
- Security 0
- Insights
-Quantic-Kernel-AOSP-Cepheus/drivers/base/arch_topology.c
-@Official-Ayrton990 Official-Ayrton990 Merge branch 'android-4.14-q' of https://android.googlesource.com/ker…
-34ac7ed 25 days ago
-@deggeman@vireshk@msrasmussen@gregkh@sudeep-holla@robherring@credp@qiwuchen@Official-Ayrton990
-508 lines (408 sloc)  11.3 KB
- 
 /*
  * Arch specific cpu topology information
  *
@@ -533,16 +506,3 @@ static void parsing_done_workfn(struct work_struct *work)
 #else
 core_initcall(free_raw_capacity);
 #endif
-© 2020 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-

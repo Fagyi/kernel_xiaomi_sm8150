@@ -471,7 +471,7 @@ static void __init map_mem(pgd_t *pgd)
 	struct memblock_region *reg;
 	int flags = 0;
 
-	if (rodata_full || debug_pagealloc_enabled())
+	if (debug_pagealloc_enabled())
 		flags = NO_BLOCK_MAPPINGS | NO_CONT_MAPPINGS;
 
 	/*
@@ -572,19 +572,7 @@ static void __init map_kernel_segment(pgd_t *pgd, void *va_start, void *va_end,
 
 static int __init parse_rodata(char *arg)
 {
-	int ret = strtobool(arg, &rodata_enabled);
-	if (!ret) {
-		rodata_full = false;
-		return 0;
-	}
-
-	/* permit 'full' in addition to boolean options */
-	if (strcmp(arg, "full"))
-		return -EINVAL;
-
-	rodata_enabled = true;
-	rodata_full = true;
-	return 0;
+	return strtobool(arg, &rodata_enabled);
 }
 early_param("rodata", parse_rodata);
 
@@ -1336,9 +1324,13 @@ void *__init __fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot)
 	if (fdt_magic(dt_virt) != FDT_MAGIC)
 		return NULL;
 
+#ifdef CONFIG_BUILD_ARM64_EMBEDDED_DTB
+	*size = MAX_FDT_SIZE;
+#else
 	*size = fdt_totalsize(dt_virt);
 	if (*size > MAX_FDT_SIZE)
 		return NULL;
+#endif
 
 	if (offset + *size > SWAPPER_BLOCK_SIZE)
 		create_mapping_noalloc(round_down(dt_phys, SWAPPER_BLOCK_SIZE), dt_virt_base,
@@ -1352,7 +1344,8 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys)
 	void *dt_virt;
 	int size;
 
-	dt_virt = __fixmap_remap_fdt(dt_phys, &size, PAGE_KERNEL_RO);
+	dt_virt = __fixmap_remap_fdt(dt_phys, &size,
+		IS_ENABLED(CONFIG_BUILD_ARM64_EMBEDDED_DTB) ? PAGE_KERNEL : PAGE_KERNEL_RO);
 	if (!dt_virt)
 		return NULL;
 
