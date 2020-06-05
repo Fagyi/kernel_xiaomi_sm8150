@@ -255,3 +255,9 @@
 &usb_qmp_phy {
 	status = "ok";
 };
+
+&soc {
+	restart@c264000 {
+		qcom,force-warm-reboot;
+	};
+};
