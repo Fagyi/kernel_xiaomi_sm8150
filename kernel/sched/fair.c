@@ -9450,7 +9450,7 @@ redo:
 next:
 		trace_sched_load_balance_skip_tasks(env->src_cpu, env->dst_cpu,
 				env->src_grp_type, p->pid, load, task_util(p),
-				cpumask_bits(&p->cpus_allowed)[0], env->flags );
+				cpumask_bits(&p->cpus_allowed)[0]);
 		list_move_tail(&p->se.group_node, tasks);
 	}
 
