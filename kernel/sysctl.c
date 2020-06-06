@@ -330,8 +330,7 @@ static struct ctl_table kern_table[] = {
 		.proc_handler   = proc_dointvec,
 	},
 #endif
-#if defined(CONFIG_IRQSOFF_TRACER) && defined(CONFIG_PREEMPTIRQ_EVENTS) && \
-		!defined(CONFIG_PROVE_LOCKING)
+#if defined(CONFIG_IRQSOFF_TRACER) && defined(CONFIG_PREEMPTIRQ_EVENTS)
 	{
 		.procname       = "irqsoff_tracing_threshold_ns",
 		.data           = &sysctl_irqsoff_tracing_threshold_ns,
