@@ -632,18 +632,17 @@ int npu_enable_core_power(struct npu_device *npu_dev)
 	if (!pwr->pwr_vote_num) {
 		ret = npu_enable_regulators(npu_dev);
 		if (ret)
-			goto fail;
+			return ret;
 
 		ret = npu_enable_core_clocks(npu_dev);
 		if (ret) {
 			npu_disable_regulators(npu_dev);
 			pwr->pwr_vote_num = 0;
-			goto fail;
+			return ret;
 		}
 		npu_resume_devbw(npu_dev);
 	}
 	pwr->pwr_vote_num++;
-fail:
 	mutex_unlock(&npu_dev->dev_lock);
 
 	return ret;
